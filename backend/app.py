@@ -20,7 +20,7 @@ print("Model loaded.")
 
 IMG_HEIGHT  = 224
 IMG_WIDTH   = 224
-CLASS_NAMES = ['Accident', 'Non Accident']
+CLASS_NAMES = ['Non Accident', 'Accident']
 
 
 def predict_image(image_bytes):
@@ -30,9 +30,13 @@ def predict_image(image_bytes):
     img_array = np.expand_dims(img_array, axis=0)
 
     prediction = model.predict(img_array, verbose=0)
-    prob       = float(prediction[0][0])
+    prob       = float(prediction[0][0])  # prob = P(Non Accident), karena index 1 = Non Accident
     label      = CLASS_NAMES[int(prob > 0.5)]
-    return label, prob
+
+    accident_prob     = round((1 - prob) * 100, 1)  # P(Accident) = 1 - prob
+    non_accident_prob = round(prob * 100, 1)         # P(Non Accident) = prob
+
+    return label, accident_prob, non_accident_prob
 
 
 @app.route('/', methods=['GET'])
@@ -51,16 +55,15 @@ def predict():
 
     try:
         image_bytes = file.read()
-        label, prob = predict_image(image_bytes)
+        label, accident_prob, non_accident_prob = predict_image(image_bytes)
 
         return jsonify({
             'label'            : label,
-            'accident_prob'    : round(prob * 100, 1),
-            'non_accident_prob': round((1 - prob) * 100, 1),
+            'accident_prob'    : accident_prob,
+            'non_accident_prob': non_accident_prob,
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 if __name__ == '__main__':
     NGROK_AUTHTOKEN = "2xH1yLJA0zzAGofS8b3Io6gxs5b_6WsPDsHAqyUpzbgAd18nf"
