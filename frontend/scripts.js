@@ -112,40 +112,58 @@ function simulateClassify() {
   fileInput.click();
 }
 
-/* ===== API base URL ===== */
-const API_BASE_URL =
-  window.location.hostname === "localhost"
-    ? "http://127.0.0.1:8000"
-    : "https://nama-app.onrender.com";
+/* ===== Endpoint backend Flask =====
+   Karena Flask sekarang menyajikan index.html & scripts.js dari folder yang sama
+   (lihat app.py: send_from_directory(WEB_FOLDER, ...)), kita bisa pakai path
+   relatif "/predict" — otomatis mengarah ke origin yang sama, tidak perlu
+   menulis domain/ngrok URL secara hardcode. */
+const PREDICT_URL = "https://e936-2001-448a-1082-a01f-a4af-6e30-3854-c320.ngrok-free.app";
 
-/* ===== Proses file & kirim ke Flask ===== */
+/* ===== Proses file & kirim ke backend untuk prediksi ===== */
 function processFile(file) {
   const reader = new FileReader();
+
+  // Tampilkan preview gambar di Drop Zone
   reader.onload = (e) => {
     dropZone.style.backgroundImage = `url(${e.target.result})`;
     dropZone.style.backgroundSize = "cover";
     dropZone.style.backgroundPosition = "center";
     dropZone.querySelector("p").textContent = "Memproses…";
     dropZone.querySelector("span").textContent = "";
-  };
-  reader.readAsDataURL(file);
 
+    sendToServer(file);
+  };
+
+  reader.readAsDataURL(file);
+}
+
+/* ===== Kirim file ke backend Flask (/predict) ===== */
+async function sendToServer(file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  fetch(`${API_BASE_URL}/predict`, {
-    method: "POST",
-    body: formData,
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then((data) => showResult(data))
-    .catch((err) => {
-      console.error("Gagal memproses prediksi:", err);
-      showError();
+  try {
+    const res = await fetch(PREDICT_URL, {
+      method: "POST",
+      body: formData,
     });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Server error: ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    showResult({
+      label: data.label,
+      accident_prob: data.accident_prob,
+      non_accident_prob: data.non_accident_prob,
+    });
+  } catch (err) {
+    console.error("Gagal melakukan klasifikasi:", err);
+    showError();
+  }
 }
 
 /* ===== Tampilkan hasil prediksi ===== */

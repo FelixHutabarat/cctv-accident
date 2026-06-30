@@ -1,290 +1,483 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Deteksi Kecelakaan CNN</title>
 
-    <link rel="icon" type="image/png" href="cctv.png">
+    <link rel="icon" type="image/png" href="cctv.png" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-</head>
-
-<body>
-
+  <body>
     <!-- ===== NAV ===== -->
     <nav class="nav" role="navigation" aria-label="Main navigation">
-        <div class="nav-inner">
-            <a href="#" class="nav-logo">
-                <span class="nav-logo-mark">
-                    <img src="cctv.png" alt="Logo">
-                </span>
-                AccidentVision
-            </a>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#metrics">Performa</a></li>
-                <li><a href="#engine">Cara Kerja</a></li>
-                <li><a href="#demo">Demo</a></li>
-            </ul>
-            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
-                <span></span>
-            </button>
-        </div>
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">
+          <span class="nav-logo-mark">
+            <img src="cctv.png" alt="Logo" />
+          </span>
+          AccidentVision
+        </a>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#metrics">Performa</a></li>
+          <li><a href="#engine">Cara Kerja</a></li>
+          <li><a href="#demo">Demo</a></li>
+        </ul>
+        <button
+          class="nav-toggle"
+          id="navToggle"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <span></span>
+        </button>
+      </div>
     </nav>
 
     <!-- ===== HERO ===== -->
-    <section class="hero" style="padding-bottom: 50px;padding-top: 100px;">
-        <div class="container">
-            <div class="hero-badge reveal">
-                <span class="hero-badge-dot"></span>
-                Model CNN · From Scratch · Akurasi 88.0%
-            </div>
-            <h1 class="reveal">Deteksi <span class="accent-word">kecelakaan</span> dari rekaman gambar CCTV</h1>
-            <p class="hero-sub reveal">
-                Model deep learning berbasis CNN yang dibangun dari nol, mampu mengklasifikasi gambar CCTV
-                sebagai kecelakaan atau non-kecelakaan dengan akurasi 88% dalam hitungan milidetik.
-            </p>
-            <div class="hero-actions reveal">
-                <a href="#demo" class="btn-primary">
-                    Coba Demo Sekarang
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </a>
-                <a href="#engine" class="btn-ghost">Lihat Cara Kerja</a>
-            </div>
-
-            <!-- Demo Widget -->
-            <div class="demo-widget reveal" id="demo">
-                <div class="demo-toolbar">
-                    <div class="demo-dots">
-                        <span></span><span></span><span></span>
-                    </div>
-                    <div class="demo-title">AccidentVision — Image Classifier</div>
-                    <div style="width:60px;"></div>
-                </div>
-                <div class="demo-body">
-                    <div class="demo-upload" id="dropZone" onclick="simulateClassify()">
-                        <div class="demo-upload-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-                            </svg>
-                        </div>
-                        <p>Klik untuk upload gambar<br>atau tekan tombol di bawah</p>
-                        <span>JPG, PNG, WEBP — maks. 10MB</span>
-                        <div style="margin-top:8px;">
-                            <button class="btn-primary" style="font-size:13px;padding:8px 20px;"
-                                onclick="event.stopPropagation(); simulateClassify()">
-                                Upload Gambar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="demo-result" id="demoResult">
-                        <div class="demo-result-label">Hasil Prediksi</div>
-                        <div id="resultBadgeAccident" class="result-badge-accident">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path
-                                    d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                                <line x1="12" y1="9" x2="12" y2="13" />
-                                <line x1="12" y1="17" x2="12.01" y2="17" />
-                            </svg>
-                            KECELAKAAN
-                        </div>
-                        <div id="resultBadgeSafe" class="result-badge-safe">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                                <polyline points="22 4 12 14.01 9 11.01" />
-                            </svg>
-                            NON-KECELAKAAN
-                        </div>
-                        <div class="conf-bar-wrap">
-                            <div class="conf-item">
-                                <div class="conf-item-header">
-                                    <span>Kecelakaan</span>
-                                    <span id="accConf">—</span>
-                                </div>
-                                <div class="conf-bar-track">
-                                    <div class="conf-bar-fill accident" id="accBar"></div>
-                                </div>
-                            </div>
-                            <div class="conf-item">
-                                <div class="conf-item-header">
-                                    <span>Non-Kecelakaan</span>
-                                    <span id="safeConf">—</span>
-                                </div>
-                                <div class="conf-bar-track">
-                                    <div class="conf-bar-fill safe" id="safeBar"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">
-                            Model: <span style="color:var(--text-muted);font-weight:600;">CNN From Scratch</span> ·
-                            Input: 224×224px
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <section class="hero" style="padding-bottom: 50px; padding-top: 100px">
+      <div class="container">
+        <div class="hero-badge reveal">
+          <span class="hero-badge-dot"></span>
+          Model CNN · From Scratch · Akurasi 88.0%
         </div>
+        <h1 class="reveal">
+          Deteksi <span class="accent-word">kecelakaan</span> dari rekaman
+          gambar CCTV
+        </h1>
+        <p class="hero-sub reveal">
+          Model deep learning berbasis CNN yang dibangun dari nol, mampu
+          mengklasifikasi gambar CCTV sebagai kecelakaan atau non-kecelakaan
+          dengan akurasi 88% dalam hitungan milidetik.
+        </p>
+        <div class="hero-actions reveal">
+          <a href="#demo" class="btn-primary">
+            Coba Demo Sekarang
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M3 8H13M13 8L9 4M13 8L9 12"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
+          <a href="#engine" class="btn-ghost">Lihat Cara Kerja</a>
+        </div>
+
+        <!-- Demo Widget -->
+        <div class="demo-widget reveal" id="demo">
+          <div class="demo-toolbar">
+            <div class="demo-dots"><span></span><span></span><span></span></div>
+            <div class="demo-title">AccidentVision — Image Classifier</div>
+            <div style="width: 60px"></div>
+          </div>
+          <div class="demo-body">
+            <div class="demo-upload" id="dropZone" onclick="simulateClassify()">
+              <div class="demo-upload-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"
+                  />
+                </svg>
+              </div>
+              <p>Klik untuk upload gambar<br />atau tekan tombol di bawah</p>
+              <span>JPG, PNG, WEBP — maks. 10MB</span>
+              <div style="margin-top: 8px">
+                <button
+                  class="btn-primary"
+                  style="font-size: 13px; padding: 8px 20px"
+                  onclick="
+                    event.stopPropagation();
+                    simulateClassify();
+                  "
+                >
+                  Upload Gambar
+                </button>
+              </div>
+            </div>
+            <div class="demo-result" id="demoResult">
+              <div class="demo-result-label">Hasil Prediksi</div>
+              <div id="resultBadgeAccident" class="result-badge-accident">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                  />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                KECELAKAAN
+              </div>
+              <div id="resultBadgeSafe" class="result-badge-safe">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                NON-KECELAKAAN
+              </div>
+              <div class="conf-bar-wrap">
+                <div class="conf-item">
+                  <div class="conf-item-header">
+                    <span>Kecelakaan</span>
+                    <span id="accConf">—</span>
+                  </div>
+                  <div class="conf-bar-track">
+                    <div class="conf-bar-fill accident" id="accBar"></div>
+                  </div>
+                </div>
+                <div class="conf-item">
+                  <div class="conf-item-header">
+                    <span>Non-Kecelakaan</span>
+                    <span id="safeConf">—</span>
+                  </div>
+                  <div class="conf-bar-track">
+                    <div class="conf-bar-fill safe" id="safeBar"></div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="font-size: 12px; color: var(--text-dim); margin-top: 4px"
+              >
+                Model:
+                <span style="color: var(--text-muted); font-weight: 600"
+                  >CNN From Scratch</span
+                >
+                · Input: 224×224px
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ===== METRICS ===== -->
-    <section class="metrics" id="metrics" style="padding-top: 0px;padding-bottom: 50px;">
-        <div class="container">
-            <p class="metrics-label reveal">Performa model pada data uji (98 gambar)</p>
-            <div class="metrics-grid">
-                <div class="metric-item reveal">
-                    <div class="metric-number">
-                        <span class="metric-highlight">88.0</span><span class="metric-unit">%</span>
-                    </div>
-                    <p class="metric-desc">Akurasi keseluruhan pada test set</p>
-                </div>
-                <div class="metric-item reveal">
-                    <div class="metric-number">
-                        <span class="metric-highlight-safe">92.5</span><span class="metric-unit">%</span>
-                    </div>
-                    <p class="metric-desc">Recall kelas kecelakaan — meminimalkan false negative</p>
-                </div>
-                <div class="metric-item reveal">
-                    <div class="metric-number">
-                        <span>89.1</span><span class="metric-unit">%</span>
-                    </div>
-                    <p class="metric-desc">F1 Score — keseimbangan presisi dan recall</p>
-                </div>
+    <section
+      class="metrics"
+      id="metrics"
+      style="padding-top: 0px; padding-bottom: 50px"
+    >
+      <div class="container">
+        <p class="metrics-label reveal">
+          Performa model pada data uji (98 gambar)
+        </p>
+        <div class="metrics-grid">
+          <div class="metric-item reveal">
+            <div class="metric-number">
+              <span class="metric-highlight">88.0</span
+              ><span class="metric-unit">%</span>
             </div>
+            <p class="metric-desc">Akurasi keseluruhan pada test set</p>
+          </div>
+          <div class="metric-item reveal">
+            <div class="metric-number">
+              <span class="metric-highlight-safe">92.5</span
+              ><span class="metric-unit">%</span>
+            </div>
+            <p class="metric-desc">
+              Recall kelas kecelakaan — meminimalkan false negative
+            </p>
+          </div>
+          <div class="metric-item reveal">
+            <div class="metric-number">
+              <span>89.1</span><span class="metric-unit">%</span>
+            </div>
+            <p class="metric-desc">
+              F1 Score — keseimbangan presisi dan recall
+            </p>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- ===== ENGINE / HOW IT WORKS ===== -->
     <section class="engine" id="engine">
-        <div class="container">
-            <div class="section-header reveal">
-                <p class="section-tag">Cara Kerja</p>
-                <h2 class="section-title">Arsitektur CNN yang dibangun dari nol</h2>
-            </div>
-            <div class="bento-grid">
-                <!-- Card 1 -->
-                <div class="card bento-card reveal">
-                    <div class="bento-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <circle cx="8.5" cy="8.5" r="1.5" />
-                            <polyline points="21 15 16 10 5 21" />
-                        </svg>
-                    </div>
-                    <h3>Preprocessing Gambar</h3>
-                    <p>Gambar input di-resize ke 224×224px lalu dinormalisasi ke skala [0, 1] dengan membagi nilai
-                        piksel dengan 255. Dataset di-shuffle hanya pada data training untuk menjaga konsistensi
-                        evaluasi.</p>
-                    <div class="bento-card-visual">
-                        <div class="mini-pipeline">
-                            <div class="mini-pipeline-node active">Input</div>
-                            <span class="mini-pipeline-arrow">→</span>
-                            <div class="mini-pipeline-node active">Resize 224²</div>
-                            <span class="mini-pipeline-arrow">→</span>
-                            <div class="mini-pipeline-node active">÷255</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="card bento-card reveal">
-                    <div class="bento-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.5" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                        </svg>
-                    </div>
-                    <h3>3 Blok Konvolusi</h3>
-                    <p>Tiga blok Conv2D + MaxPooling dengan filter 32→64→128 mengekstrak fitur visual bertahap —
-                        dari tepi dan tekstur di layer awal hingga pola kompleks kecelakaan di layer dalam.
-                        Total 22.2 juta parameter.</p>
-                    <div class="bento-card-visual">
-                        <div class="mini-grid">
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.8)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.5)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.2)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.1)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.3)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.7)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.9)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.4)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.4)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,1.0)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.6)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.2)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.1)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.5)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.3)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.2)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.2)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.5)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.8)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.3)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.6)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.4)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.1)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.2)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.1)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.2)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.3)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.4)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.2)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.1)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.3)"></div>
-                            <div class="mini-cell" style="background:rgba(255,59,59,0.2)"></div>
-                        </div>
-                        <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">Visualisasi feature map Conv2D
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="card bento-card reveal">
-                    <div class="bento-card-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="1.5"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="M12 8v4l3 3" />
-                        </svg>
-                    </div>
-                    <h3>Klasifikasi Biner</h3>
-                    <p>Flatten → Dense(256, ReLU) → Dense(1, Sigmoid). Output sigmoid menghasilkan probabilitas
-                        0–1, dengan threshold 0.5 sebagai pemisah kelas Accident vs Non-Accident.</p>
-                    <div class="bento-card-visual">
-                        <div class="mini-bars">
-                            <div class="mini-bar dim" style="height:20%"></div>
-                            <div class="mini-bar dim" style="height:35%"></div>
-                            <div class="mini-bar dim" style="height:25%"></div>
-                            <div class="mini-bar acc" style="height:70%"></div>
-                            <div class="mini-bar acc" style="height:85%"></div>
-                            <div class="mini-bar acc" style="height:95%"></div>
-                            <div class="mini-bar saf" style="height:40%"></div>
-                            <div class="mini-bar saf" style="height:55%"></div>
-                        </div>
-                        <div style="display:flex;gap:12px;margin-top:8px;">
-                            <span style="font-size:11px;color:var(--accent);font-weight:600;">■ Accident</span>
-                            <span style="font-size:11px;color:var(--safe);font-weight:600;">■ Non-Accident</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-tag">Cara Kerja</p>
+          <h2 class="section-title">Arsitektur CNN yang dibangun dari nol</h2>
         </div>
+        <div class="bento-grid">
+          <!-- Card 1 -->
+          <div class="card bento-card reveal">
+            <div class="bento-card-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--accent)"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+            </div>
+            <h3>Preprocessing Gambar</h3>
+            <p>
+              Gambar input di-resize ke 224×224px lalu dinormalisasi ke skala
+              [0, 1] dengan membagi nilai piksel dengan 255. Dataset di-shuffle
+              hanya pada data training untuk menjaga konsistensi evaluasi.
+            </p>
+            <div class="bento-card-visual">
+              <div class="mini-pipeline">
+                <div class="mini-pipeline-node active">Input</div>
+                <span class="mini-pipeline-arrow">→</span>
+                <div class="mini-pipeline-node active">Resize 224²</div>
+                <span class="mini-pipeline-arrow">→</span>
+                <div class="mini-pipeline-node active">÷255</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="card bento-card reveal">
+            <div class="bento-card-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#A78BFA"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                />
+              </svg>
+            </div>
+            <h3>3 Blok Konvolusi</h3>
+            <p>
+              Tiga blok Conv2D + MaxPooling dengan filter 32→64→128 mengekstrak
+              fitur visual bertahap — dari tepi dan tekstur di layer awal hingga
+              pola kompleks kecelakaan di layer dalam. Total 22.2 juta
+              parameter.
+            </p>
+            <div class="bento-card-visual">
+              <div class="mini-grid">
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.8)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.5)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.2)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.1)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.3)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.7)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.9)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.4)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.4)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 1)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.6)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.2)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.1)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.5)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.3)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.2)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.2)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.5)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.8)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.3)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.6)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.4)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.1)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.2)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.1)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.2)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.3)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.4)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.2)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.1)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.3)"
+                ></div>
+                <div
+                  class="mini-cell"
+                  style="background: rgba(255, 59, 59, 0.2)"
+                ></div>
+              </div>
+              <p
+                style="font-size: 11px; color: var(--text-dim); margin-top: 8px"
+              >
+                Visualisasi feature map Conv2D
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="card bento-card reveal">
+            <div class="bento-card-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--safe)"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4l3 3" />
+              </svg>
+            </div>
+            <h3>Klasifikasi Biner</h3>
+            <p>
+              Flatten → Dense(256, ReLU) → Dense(1, Sigmoid). Output sigmoid
+              menghasilkan probabilitas 0–1, dengan threshold 0.5 sebagai
+              pemisah kelas Accident vs Non-Accident.
+            </p>
+            <div class="bento-card-visual">
+              <div class="mini-bars">
+                <div class="mini-bar dim" style="height: 20%"></div>
+                <div class="mini-bar dim" style="height: 35%"></div>
+                <div class="mini-bar dim" style="height: 25%"></div>
+                <div class="mini-bar acc" style="height: 70%"></div>
+                <div class="mini-bar acc" style="height: 85%"></div>
+                <div class="mini-bar acc" style="height: 95%"></div>
+                <div class="mini-bar saf" style="height: 40%"></div>
+                <div class="mini-bar saf" style="height: 55%"></div>
+              </div>
+              <div style="display: flex; gap: 12px; margin-top: 8px">
+                <span
+                  style="
+                    font-size: 11px;
+                    color: var(--accent);
+                    font-weight: 600;
+                  "
+                  >■ Accident</span
+                >
+                <span
+                  style="font-size: 11px; color: var(--safe); font-weight: 600"
+                  >■ Non-Accident</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
-
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0"></script>
     <script src="scripts.js"></script>
-
-</body>
-
+  </body>
 </html>
