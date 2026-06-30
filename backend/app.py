@@ -20,8 +20,7 @@ print("Model loaded.")
 
 IMG_HEIGHT  = 224
 IMG_WIDTH   = 224
-CLASS_NAMES = ['Non Accident', 'Accident']
-
+CLASS_NAMES = ['Accident', 'Non Accident']
 
 def predict_image(image_bytes):
     img       = Image.open(io.BytesIO(image_bytes)).convert('RGB')
