@@ -117,7 +117,7 @@ function simulateClassify() {
    (lihat app.py: send_from_directory(WEB_FOLDER, ...)), kita bisa pakai path
    relatif "/predict" — otomatis mengarah ke origin yang sama, tidak perlu
    menulis domain/ngrok URL secara hardcode. */
-const PREDICT_URL = "https://878d-2001-448a-1082-48e8-e5d1-59c0-323e-4f95.ngrok-free.app/predict";
+const PREDICT_URL = "https://cf9d-2001-448a-1082-a351-c589-8ee9-941c-a96e.ngrok-free.app/predict";
 
 /* ===== Proses file & kirim ke backend untuk prediksi ===== */
 function processFile(file) {
